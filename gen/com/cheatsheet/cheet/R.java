@@ -178,6 +178,9 @@ public final class R {
         public static final int aqua=0x7f060042;
         public static final int black=0x7f06000c;
         public static final int blue=0x7f06000f;
+        /**  z 
+         */
+        public static final int clear=0x7f060098;
         /**  e 
  f 
          */
@@ -234,15 +237,26 @@ public final class R {
         public static final int activity_vertical_margin=0x7f070001;
     }
     public static final class drawable {
-        public static final int ic_launcher=0x7f020000;
-        public static final int ic_menu_search=0x7f020001;
-        public static final int ic_menu_search_holo_dark=0x7f020002;
-        public static final int ic_menu_search_holo_light=0x7f020003;
+        public static final int bookmark=0x7f020000;
+        public static final int btn_star_big_off=0x7f020001;
+        public static final int btn_star_big_off_disable=0x7f020002;
+        public static final int btn_star_big_off_disable_focused=0x7f020003;
+        public static final int btn_star_big_off_pressed=0x7f020004;
+        public static final int btn_star_big_off_selected=0x7f020005;
+        public static final int btn_star_big_on=0x7f020006;
+        public static final int btn_star_big_on_disable=0x7f020007;
+        public static final int btn_star_big_on_disable_focused=0x7f020008;
+        public static final int btn_star_big_on_pressed=0x7f020009;
+        public static final int btn_star_big_on_selected=0x7f02000a;
+        public static final int ic_launcher=0x7f02000b;
+        public static final int ic_menu_search=0x7f02000c;
+        public static final int ic_menu_search_holo_dark=0x7f02000d;
+        public static final int ic_menu_search_holo_light=0x7f02000e;
     }
     public static final class id {
         public static final int RelativeLayout1=0x7f0c0005;
         public static final int action_settings=0x7f0c000a;
-        public static final int bookmarkButton=0x7f0c0006;
+        public static final int btn_bkmrk=0x7f0c0006;
         public static final int container=0x7f0c0000;
         public static final int definition=0x7f0c0004;
         public static final int description=0x7f0c0008;
@@ -314,4 +328,25 @@ public final class R {
     public static final class xml {
         public static final int searchable=0x7f040000;
     }
+    public static final class styleable {
+        /** Attributes that can be used with a ToggableImageButton.
+           <p>Includes the following attributes:</p>
+           <table>
+           <colgroup align="left" />
+           <colgroup align="left" />
+           <tr><th>Attribute</th><th>Description</th></tr>
+           <tr><td><code>{@link #ToggableImageButton_android_checked android:checked}</code></td><td></td></tr>
+           </table>
+           @see #ToggableImageButton_android_checked
+         */
+        public static final int[] ToggableImageButton = {
+            0x01010106
+        };
+        /**
+          <p>This symbol is the offset where the {@link android.R.attr#checked}
+          attribute's value can be found in the {@link #ToggableImageButton} array.
+          @attr name android:checked
+        */
+        public static final int ToggableImageButton_android_checked = 0;
+    };
 }

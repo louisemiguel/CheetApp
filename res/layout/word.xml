@@ -25,13 +25,15 @@
             android:textSize="35sp" />
 
         <ImageButton
-            android:id="@+id/bookmarkButton"
+            android:id="@+id/btn_bkmrk"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:layout_alignParentTop="false"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="5dp"
+            android:background="@color/clear"
             android:contentDescription="@string/bkmrk_cd"
-            android:src="@android:drawable/btn_star_big_off" />
+            android:src="@drawable/bookmark" />
 
     </RelativeLayout>
 
