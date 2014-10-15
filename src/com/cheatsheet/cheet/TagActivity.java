@@ -1,10 +1,14 @@
 package com.cheatsheet.cheet;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -12,10 +16,12 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.webkit.WebView;
 import android.widget.SearchView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.cheatsheet.cheet.ToggleImageButton.OnCheckedChangeListener;
 
 /**
  * Displays a tag and its definition.
@@ -39,33 +45,50 @@ public class TagActivity extends Activity {
             finish();
         } else {
             cursor.moveToFirst();
-            String codeCSS = "<style> .example_code {width:auto;background-color:#ffffff;padding:4px;padding-left:7px;border-left:4px solid #8AC007;font-size:14px;font-family:Consolas,'courier new';border-radius:4px;}.highCOM {color:green;}.highELE {color:brown;}.highATT {color:crimson;}.highVAL {color:mediumblue;}.highLT, .highGT {color:blue;}  </style>";
-            String sample = "<div class='example_code notranslate htmlHigh'><span class='highLT'>&lt;</span><span class='highELE'>a</span> <span class='highATT'>href=</span><span class='highVAL'>'http://www.w3schools.com'</span><span class='highGT'>&gt;</span>Visit W3Schools.com!<span class='highLT'>&lt;</span><span class='highELE'>/a</span><span class='highGT'>&gt;</span></div>";
-            TextView tag = (TextView) findViewById(R.id.tag);
-            TextView definition = (TextView) findViewById(R.id.definition);
-            WebView description = (WebView) findViewById(R.id.description);
-//            ToggableImageButton bookmark = (ToggableImageButton) findViewById(R.id.btn_bkmrk);
-
+            
+			final SharedPreferences pref = getApplicationContext().getSharedPreferences(getString(R.string.bookmarks), Context.MODE_MULTI_PROCESS); 
+			final Set<String> bkmrks = pref.getStringSet("bookmarked", new HashSet<String>());
+			final SharedPreferences.Editor edit = pref.edit();
+			Toast.makeText(getApplicationContext(), bkmrks.toString(), Toast.LENGTH_SHORT).show();
+			
             int tIndex = cursor.getColumnIndexOrThrow(CheatSheetDatabase.KEY_TAG);
             int dfIndex = cursor.getColumnIndexOrThrow(CheatSheetDatabase.KEY_DEFINITION);
             int dsIndex = cursor.getColumnIndexOrThrow(CheatSheetDatabase.KEY_DESCRIPTION);
-//            int bIndex = cursor.getColumnIndexOrThrow(CheatSheetDatabase.KEY_BKMRKD);
-//            isBookmarked = cursor.getInt(bIndex);
+            final String tagTxt = cursor.getString(tIndex);
+ 
+            TextView tag = (TextView) findViewById(R.id.tag);
+            TextView definition = (TextView) findViewById(R.id.definition);
+            WebView description = (WebView) findViewById(R.id.description);
+            ToggleImageButton bookmark = (ToggleImageButton) findViewById(R.id.btn_bkmrk);
             
-//            if(isBookmarked==0)
-//            	bookmark.setPressed(false);
-//            else
-//            	bookmark.setPressed(true);
-//            bookmark.setOnClickListener(new View.OnClickListener() {
-//                public void onClick(View bkmk) {
-//                	bkmk.setPressed(!bkmk.isPressed());    
-//                	bookmark.setChecked(!bookmark.isChecked());
-//                }
-//            });
+            if(bkmrks.contains(tagTxt))
+            	bookmark.setChecked(true);
             
-            tag.setText(cursor.getString(tIndex));
+            String codeCSS = "<style> .example_code {width:auto;background-color:#ffffff;padding:4px;padding-left:7px;border-left:4px solid #8AC007;font-size:14px;font-family:Consolas,'courier new';border-radius:4px;}.highCOM {color:green;}.highELE {color:brown;}.highATT {color:crimson;}.highVAL {color:mediumblue;}.highLT, .highGT {color:blue;}  </style>";
+            String sample = "<div class='example_code notranslate htmlHigh'><span class='highLT'>&lt;</span><span class='highELE'>a</span> <span class='highATT'>href=</span><span class='highVAL'>'http://www.w3schools.com'</span><span class='highGT'>&gt;</span>Visit W3Schools.com!<span class='highLT'>&lt;</span><span class='highELE'>/a</span><span class='highGT'>&gt;</span></div>";
+           
+            bookmark.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+				@Override
+				public void onCheckedChanged(ToggleImageButton buttonView, boolean isChecked) {
+					if(isChecked){
+						bkmrks.add(tagTxt);
+						edit.putStringSet("bookmarked", bkmrks);
+						Toast.makeText(getApplicationContext(), "Bookmarked!", Toast.LENGTH_SHORT).show();
+					}
+					else{
+						bkmrks.remove(tagTxt);
+						edit.remove("bookmarked");
+						edit.putStringSet("bookmarked", bkmrks);
+						Toast.makeText(getApplicationContext(), "Removed from bookmarks!", Toast.LENGTH_SHORT).show();
+					}
+					edit.commit();
+				}
+			});
+            
+            tag.setText(tagTxt);
             definition.setText(cursor.getString(dfIndex));
             description.loadData(codeCSS + sample +cursor.getString(dsIndex), "text/html", null);
+            edit.apply();
         }
     }
 
@@ -95,6 +118,9 @@ public class TagActivity extends Activity {
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 return true;
+            case R.id.exit:
+            	finish(); 
+            	return true;
             default:
                 return false;
         }

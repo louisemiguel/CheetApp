@@ -1,6 +1,5 @@
 package com.cheatsheet.cheet;
 
-import android.annotation.SuppressLint;
 import android.app.SearchManager;
 import android.content.ContentProvider;
 import android.content.ContentResolver;
@@ -13,7 +12,7 @@ import android.provider.BaseColumns;
 /**
  * Provides access to the CheatSheet database.
  */
-@SuppressLint("DefaultLocale") public class CheatSheetProvider extends ContentProvider {
+public class CheatSheetProvider extends ContentProvider {
     String TAG = "CheatSheetProvider";
 
     public static String AUTHORITY = "com.cheatsheet.cheet.CheatSheetProvider";

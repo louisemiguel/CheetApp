@@ -28,6 +28,9 @@ public final class R {
         public static final int CadetBlue=0x7f06004a;
         public static final int Chartreuse=0x7f06004b;
         public static final int Chocolate=0x7f060047;
+        /**  z 
+         */
+        public static final int Clear=0x7f060098;
         public static final int Coral=0x7f060046;
         public static final int CornflowerBlue=0x7f060049;
         /**  c 
@@ -178,9 +181,6 @@ public final class R {
         public static final int aqua=0x7f060042;
         public static final int black=0x7f06000c;
         public static final int blue=0x7f06000f;
-        /**  z 
-         */
-        public static final int clear=0x7f060098;
         /**  e 
  f 
          */
@@ -260,6 +260,7 @@ public final class R {
         public static final int container=0x7f0c0000;
         public static final int definition=0x7f0c0004;
         public static final int description=0x7f0c0008;
+        public static final int exit=0x7f0c000b;
         public static final int list=0x7f0c0002;
         public static final int scrollView1=0x7f0c0007;
         public static final int search=0x7f0c0009;
@@ -284,8 +285,10 @@ public final class R {
         public static final int app_name=0x7f080000;
         public static final int bacon=0x7f08000d;
         public static final int bkmrk_cd=0x7f080009;
+        public static final int bookmarks=0x7f08000f;
         public static final int css=0x7f08000b;
         public static final int dfn_placeholder=0x7f080007;
+        public static final int exit=0x7f080010;
         public static final int html=0x7f08000a;
         public static final int menu_search=0x7f080003;
         public static final int no_results=0x7f08000e;
@@ -329,24 +332,24 @@ public final class R {
         public static final int searchable=0x7f040000;
     }
     public static final class styleable {
-        /** Attributes that can be used with a ToggableImageButton.
+        /** Attributes that can be used with a ToggleImageButton.
            <p>Includes the following attributes:</p>
            <table>
            <colgroup align="left" />
            <colgroup align="left" />
            <tr><th>Attribute</th><th>Description</th></tr>
-           <tr><td><code>{@link #ToggableImageButton_android_checked android:checked}</code></td><td></td></tr>
+           <tr><td><code>{@link #ToggleImageButton_android_checked android:checked}</code></td><td></td></tr>
            </table>
-           @see #ToggableImageButton_android_checked
+           @see #ToggleImageButton_android_checked
          */
-        public static final int[] ToggableImageButton = {
+        public static final int[] ToggleImageButton = {
             0x01010106
         };
         /**
           <p>This symbol is the offset where the {@link android.R.attr#checked}
-          attribute's value can be found in the {@link #ToggableImageButton} array.
+          attribute's value can be found in the {@link #ToggleImageButton} array.
           @attr name android:checked
         */
-        public static final int ToggableImageButton_android_checked = 0;
+        public static final int ToggleImageButton_android_checked = 0;
     };
 }

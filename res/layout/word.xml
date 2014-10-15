@@ -24,15 +24,15 @@
             android:textColor="@color/white"
             android:textSize="35sp" />
 
-        <ImageButton
+        <com.cheatsheet.cheet.ToggleImageButton
             android:id="@+id/btn_bkmrk"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:layout_marginRight="5dp"
-            android:background="@color/clear"
-            android:contentDescription="@string/bkmrk_cd"
+            android:layout_marginRight="8dp"
+            android:background="@color/Clear"
+            android:checked="false"
             android:src="@drawable/bookmark" />
 
     </RelativeLayout>
@@ -45,7 +45,7 @@
         android:paddingTop="5dp"
         android:text="@string/dfn_placeholder"
         android:textAlignment="center"
-        android:textColor="@color/black"
+        android:textColor="@color/win8_orange"
         android:textSize="18sp" />
 
     <ScrollView

@@ -1,9 +1,18 @@
 package com.cheatsheet.cheet;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+
 import android.annotation.SuppressLint;
 import android.app.SearchManager;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -12,11 +21,8 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.provider.BaseColumns;
 import android.text.TextUtils;
 import android.util.Log;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.HashMap;
+import android.widget.Toast;
+
 
 /**
  * Contains logic to return specific tags from the cheatsheet database, and
@@ -24,10 +30,12 @@ import java.util.HashMap;
  */
 @SuppressLint("DefaultLocale") public class CheatSheetDatabase {
     private static final String TAG = "CheatSheetDatabase";
+    public final Context ctx;
+    
 
     //The columns we'll include in the dictionary table
-    public static final String KEY_BKMRKD = "BOOKMARKED";
-    public static final String KEY_VSTD = "VISITED";
+//    public static final String KEY_BKMRKD = "BOOKMARKED";
+//    public static final String KEY_VSTD = "VISITED";
     public static final String KEY_TAG = SearchManager.SUGGEST_COLUMN_TEXT_1;
     public static final String KEY_DEFINITION = SearchManager.SUGGEST_COLUMN_TEXT_2;
     public static final String KEY_DESCRIPTION = SearchManager.SUGGEST_COLUMN_INTENT_DATA;
@@ -44,6 +52,7 @@ import java.util.HashMap;
      * @param context The Context within which to work, used to create the DB
      */
     public CheatSheetDatabase(Context context) {
+    	ctx = context;
         mDatabaseOpenHelper = new DictionaryOpenHelper(context);
     }
 
@@ -56,8 +65,8 @@ import java.util.HashMap;
     private static HashMap<String,String> buildColumnMap() {
         HashMap<String,String> map = new HashMap<String,String>();
         map.put(KEY_TAG, KEY_TAG);
-        map.put(KEY_BKMRKD, KEY_BKMRKD);
-        map.put(KEY_VSTD, KEY_VSTD);
+//        map.put(KEY_BKMRKD, KEY_BKMRKD);
+//        map.put(KEY_VSTD, KEY_VSTD);
         map.put(KEY_DEFINITION, KEY_DEFINITION);
         map.put(KEY_DESCRIPTION, KEY_DESCRIPTION);
         map.put(BaseColumns._ID, "rowid AS " +
@@ -95,7 +104,12 @@ import java.util.HashMap;
      * @return Cursor over all words that match, or null if none found.
      */
     public Cursor getTagMatches(String query, String[] columns) {
-        String selection = KEY_DEFINITION + " MATCH ?";
+    	String selection = KEY_DEFINITION + " MATCH ?";
+        String[] selectionArgs = new String[] {query+"*"};   
+        SharedPreferences pref = ctx.getSharedPreferences("bookmarks", Context.MODE_MULTI_PROCESS); 
+		Set<String> bkmrks = pref.getStringSet("bookmarked", new HashSet<String>());
+		//String[] queries = (String[]) bkmrks.toArray();
+		//Toast.makeText(ctx, bkmrks.toString(), Toast.LENGTH_SHORT).show();
         if(query.toUpperCase().contains("[HTML]")){
         	//selection = KEY_DEFINITION + " MATCH ?";       	
         }
@@ -105,13 +119,20 @@ import java.util.HashMap;
         else if(query.toUpperCase().contains("[PHP]")){
         	//selection = KEY_DEFINITION + " MATCH ?";
         }
+        else if(query.toUpperCase().contains("BOOKMARKS")){
+        	String selectionX = KEY_TAG + " IN ("+ makePlaceholders(bkmrks.size())+")"; 
+        	String selectionArgsX = bkmrks.toString();
+        	String[] queries = selectionArgsX.replace("[","").replace("]","").trim().split(",");
+        	Toast.makeText(ctx, queries.length + queries[0] + queries[queries.length-1] + selectionX, Toast.LENGTH_SHORT).show();
+        	return query(selectionX, queries, columns);
+        }
+        else if(query.toUpperCase().contains("HISTORY")){
+            
+        }
         else{
         	selection = KEY_TAG + " MATCH ?";
         }
         	
-        
-        String[] selectionArgs = new String[] {query+"*"};        
-        
         return query(selection, selectionArgs, columns);
 
         /* This builds a query that looks like:
@@ -128,7 +149,20 @@ import java.util.HashMap;
          *   the entire table, but sorting the relevance could be difficult.
          */
     }
-
+    
+    String makePlaceholders(int len) {
+        if (len < 1) {
+            // It will lead to an invalid query anyway ..
+            throw new RuntimeException("No placeholders");
+        } else {
+            StringBuilder sb = new StringBuilder(len * 2 - 1);
+            sb.append(" ?");
+            for (int i = 1; i < len; i++) {
+                sb.append(", ?");
+            }
+            return sb.toString();
+        }
+    }
     /**
      * Performs a database query.
      * @param selection The selection clause
@@ -176,8 +210,8 @@ import java.util.HashMap;
                     KEY_TAG + ", " +
                     KEY_DEFINITION + ", " +
                     KEY_DESCRIPTION + ", " +
-                    KEY_BKMRKD + ", " +
-                    KEY_VSTD + ", " +
+//                    KEY_BKMRKD + ", " +
+//                    KEY_VSTD + ", " +
                     ");";
 
         DictionaryOpenHelper(Context context) {
@@ -238,8 +272,8 @@ import java.util.HashMap;
             initialValues.put(KEY_TAG, tag);
             initialValues.put(KEY_DEFINITION, definition);
             initialValues.put(KEY_DESCRIPTION, description);
-            initialValues.put(KEY_BKMRKD, 0);
-            initialValues.put(KEY_VSTD, 0);
+//            initialValues.put(KEY_BKMRKD, 0);
+//            initialValues.put(KEY_VSTD, 0);
             return mDatabase.insert(FTS_VIRTUAL_TABLE, null, initialValues);
         }
 

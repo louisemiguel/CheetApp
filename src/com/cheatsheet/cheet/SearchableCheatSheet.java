@@ -1,5 +1,8 @@
 package com.cheatsheet.cheet;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.ActionBar.TabListener;
@@ -7,6 +10,7 @@ import android.app.FragmentTransaction;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -55,6 +59,25 @@ public class SearchableCheatSheet extends FragmentActivity implements TabListene
         actionBar.addTab(actionBar.newTab().setText("PHP").setTabListener(this));
         actionBar.addTab(actionBar.newTab().setText("BOOKMARKS").setTabListener(this));
         actionBar.addTab(actionBar.newTab().setText("HISTORY").setTabListener(this));
+        
+        mListView.setOnTouchListener(new OnSwipeTouchListener(this) {
+			@Override
+			public void onSwipeRight() {
+				super.onSwipeRight();
+				int prevTab = actionBar.getSelectedNavigationIndex()-1;
+				if(prevTab==-1)
+					prevTab = actionBar.getTabCount()-1;
+				actionBar.setSelectedNavigationItem(prevTab);
+			}
+			@Override
+			public void onSwipeLeft() {
+				super.onSwipeLeft();
+				int nextTab = actionBar.getSelectedNavigationIndex()+1;
+				if(nextTab > actionBar.getTabCount()-1)
+					nextTab = 0;
+				actionBar.setSelectedNavigationItem(nextTab);
+			}
+		});
     }
 
     @Override
@@ -84,7 +107,17 @@ public class SearchableCheatSheet extends FragmentActivity implements TabListene
      * @param query The search query
      */
     private void showResults(String query) {
-
+//		SharedPreferences pref = getApplicationContext().getSharedPreferences(getString(R.string.bookmarks), Context.MODE_MULTI_PROCESS); 
+//		Set<String> bkmrks = pref.getStringSet("bookmarked", new HashSet<String>());
+//		
+//		String[] queries = new String[bkmrks.size()];
+//		queries[0] = query;
+		//String[] bkmrk = (String[]) bkmrks.toArray();
+//		queries[0] = query;
+//		for(int i=1;i<queries.length;i++){
+//			queries[i] = bkmrk[i-1];
+//		}
+//		Toast.makeText(getApplicationContext(), queries.toString(), Toast.LENGTH_SHORT).show();
         @SuppressWarnings("deprecation")
 		Cursor cursor = managedQuery(CheatSheetProvider.CONTENT_URI, null, null,
                                 new String[] {query}, null);
@@ -152,6 +185,9 @@ public class SearchableCheatSheet extends FragmentActivity implements TabListene
             case R.id.search:
                 onSearchRequested();
                 return true;
+            case R.id.exit:
+            	finish();
+            	return true;
             default:
                 return false;
         }
@@ -159,25 +195,21 @@ public class SearchableCheatSheet extends FragmentActivity implements TabListene
 
 	@Override
 	public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
-		if (tab.getText() == "") {
-			getActionBar().removeTab(tab); 
-		}
-		else if (tab.getText() == "HTML") {
+		
+		if (tab.getText() == "HTML") {
 			showResults("[HTML]");
 		}
 		else if (tab.getText() == "CSS") {
 			showResults("[CSS]");
 		}           
-		else if (tab.getText() == "PHP"){ 
+		else if (tab.getText() == "PHP") { 
 			showResults("[PHP]");
 		}
 		else if (tab.getText() == "BOOKMARKS") {
-			//showResults("[CSS]");
-			Toast.makeText(getApplicationContext(), "BOOKMARKS", Toast.LENGTH_SHORT).show();
+			showResults("BOOKMARKS");
 		}           
-		else if (tab.getText() == "HISTORY"){ 
-			//showResults("[PHP]");
-			Toast.makeText(getApplicationContext(), "VISITED", Toast.LENGTH_SHORT).show();
+		else if (tab.getText() == "HISTORY") { 
+			showResults("HISTORY");
 		}
 	}
 
