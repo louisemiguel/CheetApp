@@ -20,5 +20,7 @@
     </plurals>
     <string name="no_results">No results found for \"%s\"</string>
     <string name="bookmarks">bookmarks</string>
-    <string name="exit">exit</string>
+    <string name="clear_bookmarks">Clear Bookmarks</string>
+    <string name="clear_history">Clear History</string>
+    <string name="exit">Exit</string>
 </resources>

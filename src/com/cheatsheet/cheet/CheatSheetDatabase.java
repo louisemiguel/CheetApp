@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import android.annotation.SuppressLint;
@@ -15,13 +16,13 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.database.MergeCursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.provider.BaseColumns;
 import android.text.TextUtils;
 import android.util.Log;
-import android.widget.Toast;
 
 
 /**
@@ -31,11 +32,8 @@ import android.widget.Toast;
 @SuppressLint("DefaultLocale") public class CheatSheetDatabase {
     private static final String TAG = "CheatSheetDatabase";
     public final Context ctx;
-    
 
     //The columns we'll include in the dictionary table
-//    public static final String KEY_BKMRKD = "BOOKMARKED";
-//    public static final String KEY_VSTD = "VISITED";
     public static final String KEY_TAG = SearchManager.SUGGEST_COLUMN_TEXT_1;
     public static final String KEY_DEFINITION = SearchManager.SUGGEST_COLUMN_TEXT_2;
     public static final String KEY_DESCRIPTION = SearchManager.SUGGEST_COLUMN_INTENT_DATA;
@@ -65,8 +63,6 @@ import android.widget.Toast;
     private static HashMap<String,String> buildColumnMap() {
         HashMap<String,String> map = new HashMap<String,String>();
         map.put(KEY_TAG, KEY_TAG);
-//        map.put(KEY_BKMRKD, KEY_BKMRKD);
-//        map.put(KEY_VSTD, KEY_VSTD);
         map.put(KEY_DEFINITION, KEY_DEFINITION);
         map.put(KEY_DESCRIPTION, KEY_DESCRIPTION);
         map.put(BaseColumns._ID, "rowid AS " +
@@ -106,10 +102,10 @@ import android.widget.Toast;
     public Cursor getTagMatches(String query, String[] columns) {
     	String selection = KEY_DEFINITION + " MATCH ?";
         String[] selectionArgs = new String[] {query+"*"};   
-        SharedPreferences pref = ctx.getSharedPreferences("bookmarks", Context.MODE_MULTI_PROCESS); 
+        SharedPreferences pref = ctx.getSharedPreferences("cheatsheet_pref", Context.MODE_MULTI_PROCESS); 
 		Set<String> bkmrks = pref.getStringSet("bookmarked", new HashSet<String>());
-		//String[] queries = (String[]) bkmrks.toArray();
-		//Toast.makeText(ctx, bkmrks.toString(), Toast.LENGTH_SHORT).show();
+		Set<String> vstd = pref.getStringSet("visited", new HashSet<String>());
+
         if(query.toUpperCase().contains("[HTML]")){
         	//selection = KEY_DEFINITION + " MATCH ?";       	
         }
@@ -119,15 +115,27 @@ import android.widget.Toast;
         else if(query.toUpperCase().contains("[PHP]")){
         	//selection = KEY_DEFINITION + " MATCH ?";
         }
-        else if(query.toUpperCase().contains("BOOKMARKS")){
-        	String selectionX = KEY_TAG + " IN ("+ makePlaceholders(bkmrks.size())+")"; 
-        	String selectionArgsX = bkmrks.toString();
-        	String[] queries = selectionArgsX.replace("[","").replace("]","").trim().split(",");
-        	Toast.makeText(ctx, queries.length + queries[0] + queries[queries.length-1] + selectionX, Toast.LENGTH_SHORT).show();
-        	return query(selectionX, queries, columns);
+        else if(query.toUpperCase().contains("BOOKMARKS") && bkmrks.size()>0){
+        	Iterator<String> iter = bkmrks.iterator();
+        	Cursor[] cursors = new Cursor[bkmrks.size()];
+        	for(int i = 0;iter.hasNext();i++){
+        		Cursor c = query(KEY_TAG + " MATCH ?",new String[] {iter.next()},columns);
+          	  	c.moveToFirst();
+          	  	cursors[i] = c;
+        	}
+        	MergeCursor merged = new MergeCursor(cursors); 
+        	return merged;
         }
-        else if(query.toUpperCase().contains("HISTORY")){
-            
+        else if(query.toUpperCase().contains("HISTORY") && vstd.size()>0){
+        	Iterator<String> iter = vstd.iterator();
+        	Cursor[] cursors = new Cursor[vstd.size()];
+        	for(int i = 0;iter.hasNext();i++){
+        		Cursor c = query(KEY_TAG + " MATCH ?",new String[] {iter.next()},columns);
+          	  	c.moveToFirst();
+          	  	cursors[i] = c;
+        	}
+        	MergeCursor merged = new MergeCursor(cursors); 
+        	return merged;
         }
         else{
         	selection = KEY_TAG + " MATCH ?";
@@ -149,20 +157,7 @@ import android.widget.Toast;
          *   the entire table, but sorting the relevance could be difficult.
          */
     }
-    
-    String makePlaceholders(int len) {
-        if (len < 1) {
-            // It will lead to an invalid query anyway ..
-            throw new RuntimeException("No placeholders");
-        } else {
-            StringBuilder sb = new StringBuilder(len * 2 - 1);
-            sb.append(" ?");
-            for (int i = 1; i < len; i++) {
-                sb.append(", ?");
-            }
-            return sb.toString();
-        }
-    }
+        
     /**
      * Performs a database query.
      * @param selection The selection clause
@@ -210,8 +205,6 @@ import android.widget.Toast;
                     KEY_TAG + ", " +
                     KEY_DEFINITION + ", " +
                     KEY_DESCRIPTION + ", " +
-//                    KEY_BKMRKD + ", " +
-//                    KEY_VSTD + ", " +
                     ");";
 
         DictionaryOpenHelper(Context context) {
@@ -272,8 +265,6 @@ import android.widget.Toast;
             initialValues.put(KEY_TAG, tag);
             initialValues.put(KEY_DEFINITION, definition);
             initialValues.put(KEY_DESCRIPTION, description);
-//            initialValues.put(KEY_BKMRKD, 0);
-//            initialValues.put(KEY_VSTD, 0);
             return mDatabase.insert(FTS_VIRTUAL_TABLE, null, initialValues);
         }
 

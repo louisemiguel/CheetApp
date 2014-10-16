@@ -1,7 +1,6 @@
 package com.cheatsheet.cheet;
 
 import java.util.HashSet;
-import java.util.Set;
 
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
@@ -107,17 +106,6 @@ public class SearchableCheatSheet extends FragmentActivity implements TabListene
      * @param query The search query
      */
     private void showResults(String query) {
-//		SharedPreferences pref = getApplicationContext().getSharedPreferences(getString(R.string.bookmarks), Context.MODE_MULTI_PROCESS); 
-//		Set<String> bkmrks = pref.getStringSet("bookmarked", new HashSet<String>());
-//		
-//		String[] queries = new String[bkmrks.size()];
-//		queries[0] = query;
-		//String[] bkmrk = (String[]) bkmrks.toArray();
-//		queries[0] = query;
-//		for(int i=1;i<queries.length;i++){
-//			queries[i] = bkmrk[i-1];
-//		}
-//		Toast.makeText(getApplicationContext(), queries.toString(), Toast.LENGTH_SHORT).show();
         @SuppressWarnings("deprecation")
 		Cursor cursor = managedQuery(CheatSheetProvider.CONTENT_URI, null, null,
                                 new String[] {query}, null);
@@ -127,7 +115,7 @@ public class SearchableCheatSheet extends FragmentActivity implements TabListene
     		mTextView.setText(getString(R.string.no_results, new Object[] {query}));
         } 
         else 
-        {
+        {	
             // Display the number of results
             int count = cursor.getCount();
             String countString = getResources().getQuantityString(R.plurals.search_results,
@@ -144,8 +132,7 @@ public class SearchableCheatSheet extends FragmentActivity implements TabListene
 
             // Create a simple cursor adapter for the definitions and apply them to the ListView
             @SuppressWarnings("deprecation")
-			SimpleCursorAdapter tags = new SimpleCursorAdapter(this,
-                                          R.layout.result, cursor, from, to);
+			SimpleCursorAdapter tags = new SimpleCursorAdapter(this,R.layout.result, cursor, from, to);
             mListView.setAdapter(tags);
 
             // Define the on-click listener for the list items
@@ -185,12 +172,38 @@ public class SearchableCheatSheet extends FragmentActivity implements TabListene
             case R.id.search:
                 onSearchRequested();
                 return true;
+            case R.id.clr_bkmrks:
+            	if(clearPref(0)){
+	            	if((getActionBar().getSelectedTab().getText())=="BOOKMARKS")
+	    				showResults("BOOKMARKS");
+            	}
+            	return true;
+            case R.id.clr_hstry:
+            	if(clearPref(1)){
+	    			if((getActionBar().getSelectedTab().getText())=="HISTORY")
+	    				showResults("HISTORY");
+            	}
+            	return true;
             case R.id.exit:
             	finish();
             	return true;
             default:
                 return false;
         }
+    }
+    
+    public boolean clearPref(int ch){
+		SharedPreferences pref = getApplicationContext().getSharedPreferences("cheatsheet_pref", Context.MODE_MULTI_PROCESS); 
+		SharedPreferences.Editor edit = pref.edit();
+		if(ch==0){
+			edit.putStringSet("bookmarked", new HashSet<String>());
+			Toast.makeText(getApplicationContext(), "Bookmarks cleared!", Toast.LENGTH_SHORT).show();
+		}
+		else if(ch==1){
+			edit.putStringSet("visited", new HashSet<String>());
+			Toast.makeText(getApplicationContext(), "History cleared!", Toast.LENGTH_SHORT).show();
+		}
+		return edit.commit();	
     }
 
 	@Override

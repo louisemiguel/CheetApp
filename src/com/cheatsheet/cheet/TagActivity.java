@@ -46,12 +46,12 @@ public class TagActivity extends Activity {
         } else {
             cursor.moveToFirst();
             
-			final SharedPreferences pref = getApplicationContext().getSharedPreferences(getString(R.string.bookmarks), Context.MODE_MULTI_PROCESS); 
+			final SharedPreferences pref = getApplicationContext().getSharedPreferences("cheatsheet_pref", Context.MODE_MULTI_PROCESS); 
 			final Set<String> bkmrks = pref.getStringSet("bookmarked", new HashSet<String>());
+			final Set<String> vstd = pref.getStringSet("visited", new HashSet<String>());
 			final SharedPreferences.Editor edit = pref.edit();
-			Toast.makeText(getApplicationContext(), bkmrks.toString(), Toast.LENGTH_SHORT).show();
 			
-            int tIndex = cursor.getColumnIndexOrThrow(CheatSheetDatabase.KEY_TAG);
+            int tIndex = cursor.getColumnIndexOrThrow(CheatSheetDatabase.KEY_TAG);  
             int dfIndex = cursor.getColumnIndexOrThrow(CheatSheetDatabase.KEY_DEFINITION);
             int dsIndex = cursor.getColumnIndexOrThrow(CheatSheetDatabase.KEY_DESCRIPTION);
             final String tagTxt = cursor.getString(tIndex);
@@ -63,9 +63,8 @@ public class TagActivity extends Activity {
             
             if(bkmrks.contains(tagTxt))
             	bookmark.setChecked(true);
-            
+            			
             String codeCSS = "<style> .example_code {width:auto;background-color:#ffffff;padding:4px;padding-left:7px;border-left:4px solid #8AC007;font-size:14px;font-family:Consolas,'courier new';border-radius:4px;}.highCOM {color:green;}.highELE {color:brown;}.highATT {color:crimson;}.highVAL {color:mediumblue;}.highLT, .highGT {color:blue;}  </style>";
-            String sample = "<div class='example_code notranslate htmlHigh'><span class='highLT'>&lt;</span><span class='highELE'>a</span> <span class='highATT'>href=</span><span class='highVAL'>'http://www.w3schools.com'</span><span class='highGT'>&gt;</span>Visit W3Schools.com!<span class='highLT'>&lt;</span><span class='highELE'>/a</span><span class='highGT'>&gt;</span></div>";
            
             bookmark.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 				@Override
@@ -81,14 +80,18 @@ public class TagActivity extends Activity {
 						edit.putStringSet("bookmarked", bkmrks);
 						Toast.makeText(getApplicationContext(), "Removed from bookmarks!", Toast.LENGTH_SHORT).show();
 					}
-					edit.commit();
+		            edit.apply();
+		            //edit.commit();
 				}
 			});
             
             tag.setText(tagTxt);
             definition.setText(cursor.getString(dfIndex));
-            description.loadData(codeCSS + sample +cursor.getString(dsIndex), "text/html", null);
+            description.loadData(codeCSS+cursor.getString(dsIndex), "text/html", null);
+            vstd.add(tagTxt);
+			edit.putStringSet("visited", vstd); 
             edit.apply();
+            //edit.commit();
         }
     }
 
@@ -118,11 +121,29 @@ public class TagActivity extends Activity {
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 return true;
+            case R.id.clr_bkmrks:
+            	return clearPref(0);
+            case R.id.clr_hstry:
+            	return clearPref(1);
             case R.id.exit:
             	finish(); 
             	return true;
             default:
                 return false;
         }
+    }
+    
+    public boolean clearPref(int ch){
+		SharedPreferences pref = getApplicationContext().getSharedPreferences("cheatsheet_pref", Context.MODE_MULTI_PROCESS); 
+		SharedPreferences.Editor edit = pref.edit();
+		if(ch==0){
+			edit.putStringSet("bookmarked", new HashSet<String>());
+			Toast.makeText(getApplicationContext(), "Bookmarks cleared!", Toast.LENGTH_SHORT).show();
+		}
+		else if(ch==1){
+			edit.putStringSet("visited", new HashSet<String>());
+			Toast.makeText(getApplicationContext(), "History cleared!", Toast.LENGTH_SHORT).show();
+		}
+		return edit.commit();	
     }
 }

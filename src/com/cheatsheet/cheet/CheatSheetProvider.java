@@ -126,7 +126,6 @@ public class CheatSheetProvider extends ContentProvider {
           CheatSheetDatabase.KEY_DEFINITION,
           CheatSheetDatabase.KEY_DESCRIPTION
       };
-
       return mCheatSheet.getTag(rowId, columns);
     }
 

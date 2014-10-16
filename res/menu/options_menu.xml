@@ -6,10 +6,11 @@
           android:actionViewClass="android.widget.SearchView" />
     <item
         android:id="@+id/action_settings"
-        android:title="@string/settings" android:showAsAction="always">
+        android:title="@string/settings" android:showAsAction="always" android:icon="@drawable/ic_menu_moreoverflow_holo_dark">
         <menu>
+            <item android:id="@+id/clr_bkmrks" android:showAsAction="always" android:title="@string/clear_bookmarks"/>
+            <item android:id="@+id/clr_hstry" android:showAsAction="always" android:title="@string/clear_history"/>
             <item android:id="@+id/exit" android:showAsAction="always" android:title="@string/exit"/>
-            
         </menu>
     </item>
 </menu>
