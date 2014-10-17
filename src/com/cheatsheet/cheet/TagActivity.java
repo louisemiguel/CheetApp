@@ -46,10 +46,11 @@ public class TagActivity extends Activity {
         } else {
             cursor.moveToFirst();
             
-			final SharedPreferences pref = getApplicationContext().getSharedPreferences("cheatsheet_pref", Context.MODE_MULTI_PROCESS); 
+			final SharedPreferences pref = getApplicationContext().getSharedPreferences("cheatsheet_pref", Context.MODE_PRIVATE); 
 			final Set<String> bkmrks = pref.getStringSet("bookmarked", new HashSet<String>());
 			final Set<String> vstd = pref.getStringSet("visited", new HashSet<String>());
 			final SharedPreferences.Editor edit = pref.edit();
+			edit.clear();
 			
             int tIndex = cursor.getColumnIndexOrThrow(CheatSheetDatabase.KEY_TAG);  
             int dfIndex = cursor.getColumnIndexOrThrow(CheatSheetDatabase.KEY_DEFINITION);
@@ -81,7 +82,7 @@ public class TagActivity extends Activity {
 						Toast.makeText(getApplicationContext(), "Removed from bookmarks!", Toast.LENGTH_SHORT).show();
 					}
 		            edit.apply();
-		            //edit.commit();
+		            edit.commit();
 				}
 			});
             
@@ -91,7 +92,7 @@ public class TagActivity extends Activity {
             vstd.add(tagTxt);
 			edit.putStringSet("visited", vstd); 
             edit.apply();
-            //edit.commit();
+            edit.commit();
         }
     }
 
@@ -134,8 +135,9 @@ public class TagActivity extends Activity {
     }
     
     public boolean clearPref(int ch){
-		SharedPreferences pref = getApplicationContext().getSharedPreferences("cheatsheet_pref", Context.MODE_MULTI_PROCESS); 
+		SharedPreferences pref = getApplicationContext().getSharedPreferences("cheatsheet_pref", Context.MODE_PRIVATE); 
 		SharedPreferences.Editor edit = pref.edit();
+		edit.clear();
 		if(ch==0){
 			edit.putStringSet("bookmarked", new HashSet<String>());
 			Toast.makeText(getApplicationContext(), "Bookmarks cleared!", Toast.LENGTH_SHORT).show();

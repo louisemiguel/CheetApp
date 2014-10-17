@@ -193,8 +193,9 @@ public class SearchableCheatSheet extends FragmentActivity implements TabListene
     }
     
     public boolean clearPref(int ch){
-		SharedPreferences pref = getApplicationContext().getSharedPreferences("cheatsheet_pref", Context.MODE_MULTI_PROCESS); 
+		SharedPreferences pref = getApplicationContext().getSharedPreferences("cheatsheet_pref", Context.MODE_PRIVATE); 
 		SharedPreferences.Editor edit = pref.edit();
+		edit.clear();
 		if(ch==0){
 			edit.putStringSet("bookmarked", new HashSet<String>());
 			Toast.makeText(getApplicationContext(), "Bookmarks cleared!", Toast.LENGTH_SHORT).show();
