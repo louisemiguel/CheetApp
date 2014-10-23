@@ -12,7 +12,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
@@ -90,10 +89,10 @@ public class SearchableCheatSheet extends FragmentActivity implements TabListene
 
     private void handleIntent(Intent intent) {
         if (Intent.ACTION_VIEW.equals(intent.getAction())) {
-            // handles a click on a search suggestion; launches activity to show word
-            Intent wordIntent = new Intent(this, TagActivity.class);
-            wordIntent.setData(intent.getData());
-            startActivity(wordIntent);
+            // handles a click on a search suggestion; launches activity to show tag
+            Intent tagIntent = new Intent(this, TagActivity.class);
+            tagIntent.setData(intent.getData());
+            startActivity(tagIntent);
         } else if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             // handles a search query
             String query = intent.getStringExtra(SearchManager.QUERY);
@@ -156,12 +155,10 @@ public class SearchableCheatSheet extends FragmentActivity implements TabListene
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.options_menu, menu);
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
-            SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-            SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
-            searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-            searchView.setIconifiedByDefault(false);
-        }
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        //searchView.setIconifiedByDefault(false);
 
         return true;
     }
@@ -184,9 +181,9 @@ public class SearchableCheatSheet extends FragmentActivity implements TabListene
 	    				showResults("HISTORY");
             	}
             	return true;
-            case R.id.exit:
-            	finish();
-            	return true;
+//            case R.id.exit:
+//            	finish();
+//            	return true;
             default:
                 return false;
         }
@@ -195,7 +192,7 @@ public class SearchableCheatSheet extends FragmentActivity implements TabListene
     public boolean clearPref(int ch){
 		SharedPreferences pref = getApplicationContext().getSharedPreferences("cheatsheet_pref", Context.MODE_PRIVATE); 
 		SharedPreferences.Editor edit = pref.edit();
-		edit.clear();
+//		edit.clear();
 		if(ch==0){
 			edit.putStringSet("bookmarked", new HashSet<String>());
 			Toast.makeText(getApplicationContext(), "Bookmarks cleared!", Toast.LENGTH_SHORT).show();
@@ -204,7 +201,8 @@ public class SearchableCheatSheet extends FragmentActivity implements TabListene
 			edit.putStringSet("visited", new HashSet<String>());
 			Toast.makeText(getApplicationContext(), "History cleared!", Toast.LENGTH_SHORT).show();
 		}
-		return edit.commit();	
+		edit.apply();
+		return true;	
     }
 
 	@Override
@@ -247,8 +245,7 @@ public class SearchableCheatSheet extends FragmentActivity implements TabListene
 	@Override
 	  public void onSaveInstanceState(Bundle outState) {
 	    // Serialize the current tab position.
-	    outState.putInt(STATE_SELECTED_NAVIGATION_ITEM, getActionBar()
-	        .getSelectedNavigationIndex());
+	    outState.putInt(STATE_SELECTED_NAVIGATION_ITEM, getActionBar().getSelectedNavigationIndex());
 	  }
 	
 }

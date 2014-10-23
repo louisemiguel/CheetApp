@@ -102,8 +102,10 @@ import android.util.Log;
     public Cursor getTagMatches(String query, String[] columns) {
     	String selection = KEY_DEFINITION + " MATCH ?";
         String[] selectionArgs = new String[] {query+"*"};   
+        
         SharedPreferences pref = ctx.getSharedPreferences("cheatsheet_pref", Context.MODE_PRIVATE); 
-		Set<String> bkmrks = pref.getStringSet("bookmarked", new HashSet<String>());
+		
+        Set<String> bkmrks = pref.getStringSet("bookmarked", new HashSet<String>());
 		Set<String> vstd = pref.getStringSet("visited", new HashSet<String>());
 
         if(query.toUpperCase().contains("[HTML]")){

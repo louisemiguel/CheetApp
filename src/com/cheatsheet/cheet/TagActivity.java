@@ -46,30 +46,43 @@ public class TagActivity extends Activity {
         } else {
             cursor.moveToFirst();
             
-			final SharedPreferences pref = getApplicationContext().getSharedPreferences("cheatsheet_pref", Context.MODE_PRIVATE); 
-			final Set<String> bkmrks = pref.getStringSet("bookmarked", new HashSet<String>());
-			final Set<String> vstd = pref.getStringSet("visited", new HashSet<String>());
-			final SharedPreferences.Editor edit = pref.edit();
-			edit.clear();
-			
             int tIndex = cursor.getColumnIndexOrThrow(CheatSheetDatabase.KEY_TAG);  
             int dfIndex = cursor.getColumnIndexOrThrow(CheatSheetDatabase.KEY_DEFINITION);
             int dsIndex = cursor.getColumnIndexOrThrow(CheatSheetDatabase.KEY_DESCRIPTION);
             final String tagTxt = cursor.getString(tIndex);
- 
+            
+			final SharedPreferences pref = getApplicationContext().getSharedPreferences("cheatsheet_pref", Context.MODE_PRIVATE); 
+			final Set<String> bkmrks = pref.getStringSet("bookmarked", new HashSet<String>());
+			final Set<String> vstd = pref.getStringSet("visited", new HashSet<String>());
+			final SharedPreferences.Editor edit = pref.edit();
+//			edit.clear();
+			
+			vstd.add(tagTxt);
+			edit.putStringSet("visited", vstd); 
+            edit.apply();
+//            edit.commit();
+            
             TextView tag = (TextView) findViewById(R.id.tag);
             TextView definition = (TextView) findViewById(R.id.definition);
             WebView description = (WebView) findViewById(R.id.description);
+            			
+            String codeCSS = "<style> .example_code {width:auto;background-color:#ffffff;padding:4px;padding-left:7px;border-left:4px solid #8AC007;font-size:14px;font-family:Consolas,'courier new';border-radius:4px;}.highCOM {color:green;}.highELE {color:brown;}.highATT {color:crimson;}.highVAL {color:mediumblue;}.highLT, .highGT {color:blue;}  </style>";
+            
+            tag.setText(tagTxt);
+            definition.setText(cursor.getString(dfIndex));
+            description.loadData(codeCSS+cursor.getString(dsIndex), "text/html", null);
             ToggleImageButton bookmark = (ToggleImageButton) findViewById(R.id.btn_bkmrk);
             
             if(bkmrks.contains(tagTxt))
             	bookmark.setChecked(true);
-            			
-            String codeCSS = "<style> .example_code {width:auto;background-color:#ffffff;padding:4px;padding-left:7px;border-left:4px solid #8AC007;font-size:14px;font-family:Consolas,'courier new';border-radius:4px;}.highCOM {color:green;}.highELE {color:brown;}.highATT {color:crimson;}.highVAL {color:mediumblue;}.highLT, .highGT {color:blue;}  </style>";
-           
+            
             bookmark.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 				@Override
 				public void onCheckedChanged(ToggleImageButton buttonView, boolean isChecked) {
+//					SharedPreferences pref = getApplicationContext().getSharedPreferences("cheatsheet_pref", Context.MODE_PRIVATE); 
+//					Set<String> bkmrks = pref.getStringSet("bookmarked", new HashSet<String>());
+//					SharedPreferences.Editor edit = pref.edit();
+//					edit.clear();
 					if(isChecked){
 						bkmrks.add(tagTxt);
 						edit.putStringSet("bookmarked", bkmrks);
@@ -77,22 +90,13 @@ public class TagActivity extends Activity {
 					}
 					else{
 						bkmrks.remove(tagTxt);
-						edit.remove("bookmarked");
 						edit.putStringSet("bookmarked", bkmrks);
 						Toast.makeText(getApplicationContext(), "Removed from bookmarks!", Toast.LENGTH_SHORT).show();
 					}
 		            edit.apply();
-		            edit.commit();
+//		            edit.commit();
 				}
-			});
-            
-            tag.setText(tagTxt);
-            definition.setText(cursor.getString(dfIndex));
-            description.loadData(codeCSS+cursor.getString(dsIndex), "text/html", null);
-            vstd.add(tagTxt);
-			edit.putStringSet("visited", vstd); 
-            edit.apply();
-            edit.commit();
+			});                   
         }
     }
 
@@ -123,12 +127,14 @@ public class TagActivity extends Activity {
                 startActivity(intent);
                 return true;
             case R.id.clr_bkmrks:
-            	return clearPref(0);
-            case R.id.clr_hstry:
-            	return clearPref(1);
-            case R.id.exit:
-            	finish(); 
+            	clearPref(0);
             	return true;
+            case R.id.clr_hstry:
+            	clearPref(1);
+            	return true;
+//            case R.id.exit:
+//            	finish(); 
+//            	return true;
             default:
                 return false;
         }
@@ -137,7 +143,7 @@ public class TagActivity extends Activity {
     public boolean clearPref(int ch){
 		SharedPreferences pref = getApplicationContext().getSharedPreferences("cheatsheet_pref", Context.MODE_PRIVATE); 
 		SharedPreferences.Editor edit = pref.edit();
-		edit.clear();
+//		edit.clear();
 		if(ch==0){
 			edit.putStringSet("bookmarked", new HashSet<String>());
 			Toast.makeText(getApplicationContext(), "Bookmarks cleared!", Toast.LENGTH_SHORT).show();
@@ -146,6 +152,7 @@ public class TagActivity extends Activity {
 			edit.putStringSet("visited", new HashSet<String>());
 			Toast.makeText(getApplicationContext(), "History cleared!", Toast.LENGTH_SHORT).show();
 		}
-		return edit.commit();	
+		edit.apply();
+		return true;	
     }
 }

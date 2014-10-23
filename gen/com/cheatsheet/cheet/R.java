@@ -258,7 +258,6 @@ public final class R {
         public static final int container=0x7f0c0000;
         public static final int definition=0x7f0c0004;
         public static final int description=0x7f0c0008;
-        public static final int exit=0x7f0c000d;
         public static final int list=0x7f0c0002;
         public static final int scrollView1=0x7f0c0007;
         public static final int search=0x7f0c0009;
